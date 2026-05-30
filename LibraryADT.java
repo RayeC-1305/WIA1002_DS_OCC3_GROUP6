@@ -7,4 +7,7 @@ public interface LibraryADT {
     Book searchBook(int isbn);
     boolean borrowBook(int isbn);
     void viewHistory();
+    Book searchBookByTitle(String title);
+    boolean returnLastBorrowedBook();
+    int getCatalogueSize();
 }

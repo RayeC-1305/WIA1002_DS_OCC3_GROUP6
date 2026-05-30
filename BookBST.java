@@ -135,4 +135,41 @@ public class BookBST {
             inOrder(node.right);
         }
     }
+
+    // --- Search by Title --------------------------------------------------
+    /**
+     * Public method to search for a book by title (O(n) traversal).
+     */
+    public Book searchByTitle(String title) {
+        return searchByTitleRecursive(root, title);
+    }
+
+    private Book searchByTitleRecursive(Book node, String title) {
+        if (node == null) {
+            return null;
+        }
+        if (node.title.equalsIgnoreCase(title)) {
+            return node;
+        }
+        Book leftResult = searchByTitleRecursive(node.left, title);
+        if (leftResult != null) {
+            return leftResult;
+        }
+        return searchByTitleRecursive(node.right, title);
+    }
+
+    // --- Count Total Books ------------------------------------------------
+    /**
+     * Public method to count the total number of books in the catalogue.
+     */
+    public int count() {
+        return countRecursive(root);
+    }
+
+    private int countRecursive(Book node) {
+        if (node == null) {
+            return 0;
+        }
+        return 1 + countRecursive(node.left) + countRecursive(node.right);
+    }
 }

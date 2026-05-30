@@ -47,6 +47,20 @@ public class BorrowStack {
     }
 
     /**
+     * Pops the most recently borrowed book from the stack.
+     * @return A Book object containing the popped details, or null if empty.
+     */
+    public Book pop() {
+        if (isEmpty()) {
+            return null;
+        }
+        Book poppedBook = new Book(top.isbn, top.title, top.author);
+        top = top.next;
+        size--;
+        return poppedBook;
+    }
+
+    /**
      * Returns the number of records in the stack.
      */
     public int size() {

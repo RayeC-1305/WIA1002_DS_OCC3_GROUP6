@@ -24,13 +24,13 @@ public class SmartLibrary {
 
         while (running) {
             printMenu();
-            System.out.print("  Enter your choice (1-6): ");
+            System.out.print("  Enter your choice (1-8): ");
 
             int choice;
             try {
                 choice = Integer.parseInt(scanner.nextLine().trim());
             } catch (NumberFormatException e) {
-                System.out.println("\n  [ERROR] Invalid input! Please enter a number between 1 and 6.");
+                System.out.println("\n  [ERROR] Invalid input! Please enter a number between 1 and 8.");
                 continue;
             }
 
@@ -42,20 +42,26 @@ public class SmartLibrary {
                     searchBookMenu(scanner, library);
                     break;
                 case 3:
-                    borrowBookMenu(scanner, library);
+                    searchBookByTitleMenu(scanner, library);
                     break;
                 case 4:
-                    library.viewHistory();
+                    borrowBookMenu(scanner, library);
                     break;
                 case 5:
-                    library.displayCatalogue();
+                    library.returnLastBorrowedBook();
                     break;
                 case 6:
+                    library.viewHistory();
+                    break;
+                case 7:
+                    library.displayCatalogue();
+                    break;
+                case 8:
                     running = false;
                     System.out.println("\n  Thank you for using Smart Library. Goodbye!");
                     break;
                 default:
-                    System.out.println("\n  [ERROR] Invalid choice! Please select a number between 1 and 6.");
+                    System.out.println("\n  [ERROR] Invalid choice! Please select a number between 1 and 8.");
             }
         }
 
@@ -70,11 +76,13 @@ public class SmartLibrary {
         System.out.println("  MAIN MENU");
         System.out.println(LINE);
         System.out.println("  1. Add Book");
-        System.out.println("  2. Search Book");
-        System.out.println("  3. Borrow Book");
-        System.out.println("  4. View Borrowing History");
-        System.out.println("  5. Display Catalogue");
-        System.out.println("  6. Exit");
+        System.out.println("  2. Search Book (by ISBN)");
+        System.out.println("  3. Search Book (by Title)");
+        System.out.println("  4. Borrow Book");
+        System.out.println("  5. Return Last Borrowed Book (Undo)");
+        System.out.println("  6. View Borrowing History");
+        System.out.println("  7. Display Catalogue");
+        System.out.println("  8. Exit");
         System.out.println(LINE);
     }
 
@@ -156,5 +164,19 @@ public class SmartLibrary {
         }
 
         library.borrowBook(isbn);
+    }
+
+    /**
+     * Handles the "Search Book by Title" workflow.
+     */
+    private static void searchBookByTitleMenu(Scanner scanner, SmartLibraryImpl library) {
+        System.out.println("\n  --- Search for a Book by Title ---");
+        System.out.print("  Enter Title to search: ");
+        String title = scanner.nextLine().trim();
+        if (title.isEmpty()) {
+            System.out.println("  [ERROR] Title cannot be empty.");
+            return;
+        }
+        library.searchBookByTitle(title);
     }
 }

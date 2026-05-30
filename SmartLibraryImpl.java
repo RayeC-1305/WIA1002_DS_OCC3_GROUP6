@@ -74,6 +74,49 @@ public class SmartLibraryImpl implements LibraryADT {
     public void displayCatalogue() {
         System.out.println("\n  ============ Library Catalogue (Sorted by ISBN) ============");
         catalogue.displayAll();
+        System.out.println("  Total Books in Catalogue: " + getCatalogueSize());
         System.out.println("  ============================================================");
+    }
+
+    /**
+     * Searches for a book by its title (O(n) traversal).
+     */
+    @Override
+    public Book searchBookByTitle(String title) {
+        Book found = catalogue.searchByTitle(title);
+        if (found != null) {
+            System.out.println("\n  [FOUND] " + found);
+        } else {
+            System.out.println("\n  [NOT FOUND] No book with title \"" + title + "\" exists in the catalogue.");
+        }
+        return found;
+    }
+
+    /**
+     * Pops the last borrowed book from history and adds it back to the catalogue.
+     */
+    @Override
+    public boolean returnLastBorrowedBook() {
+        Book lastBorrowed = history.pop();
+        if (lastBorrowed == null) {
+            System.out.println("\n  [FAILED] Borrowing history is empty. Nothing to return.");
+            return false;
+        }
+        boolean inserted = catalogue.insert(lastBorrowed.isbn, lastBorrowed.title, lastBorrowed.author);
+        if (inserted) {
+            System.out.println("\n  [RETURNED] \"" + lastBorrowed.title + "\" has been returned and added back to the catalogue.");
+            return true;
+        } else {
+            System.out.println("\n  [ERROR] Failed to return book. ISBN already exists in catalogue.");
+            return false;
+        }
+    }
+
+    /**
+     * Returns the total number of books currently in the catalogue.
+     */
+    @Override
+    public int getCatalogueSize() {
+        return catalogue.count();
     }
 }
