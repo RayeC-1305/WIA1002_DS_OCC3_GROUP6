@@ -4,16 +4,22 @@ A Java console application built as a Data Structures course project (WIA1002). 
 
 **Group 6 — OCC3**
 -Raye Chan Jun Foong (25006003)
--Yip Zheng Xyun
--Liew Jicson
--Ong Zheng Xi
--Hon Chi Fung
+-Yip Zheng Xyun (25006747)
+-Liew Jicson (25006927)
+-Ong Zheng Xi (25006217)
+-Hon Chi Fung (25006047)
 
 ---
 
 ## Table of Contents
 
 - [Project Overview](#project-overview)
+- [Project Report](#project-report)
+  - [Problem Statement](#problem-statement)
+  - [Approach](#approach)
+  - [Data Structures Used (Report)](#data-structures-used-report)
+  - [Testing](#testing)
+  - [Conclusion](#conclusion)
 - [Architecture](#architecture)
 - [How to Run](#how-to-run)
 - [Project Structure](#project-structure)
@@ -35,6 +41,97 @@ The Smart Library Management System allows users to:
 - **View** the full catalogue and borrowing history
 
 The system demonstrates the practical use of two fundamental data structures — a Binary Search Tree for efficient lookups and a Stack for LIFO borrowing history — connected through a clean interface-driven architecture.
+
+---
+
+## Project Report
+
+### Problem Statement
+
+Libraries need efficient systems to manage their book catalogues and track borrowing activity. A traditional flat-list or array-based approach suffers from poor performance as the collection grows — searching for a specific book takes O(n) time, and maintaining sorted order after insertions and deletions requires costly element shifting.
+
+This project addresses two core problems:
+
+1. **Efficient catalogue management** — Books must be added, searched, and removed quickly as the library grows. A linear data structure does not scale well for these operations.
+2. **Borrowing history tracking with undo capability** — When a book is borrowed, the system must record the transaction and support returning the most recently borrowed book (a natural "undo" operation) without complex bookkeeping.
+
+The goal is to build a console-based library management system that leverages appropriate data structures to solve both problems efficiently while maintaining a clean, modular architecture.
+
+### Approach
+
+The system was designed using a **layered architecture** with clear separation of concerns:
+
+1. **Interface-driven design** — A `LibraryADT` interface defines the public contract, enforcing information hiding. The UI layer interacts only through this interface and never accesses the internal data structures directly.
+2. **BST for the catalogue** — A Binary Search Tree was chosen to store books indexed by ISBN, providing O(log n) average-case performance for insertions, searches, and deletions — a significant improvement over the O(n) operations of a list.
+3. **Stack for borrowing history** — A linked-list-based stack was chosen to record borrowing transactions. The LIFO (Last In, First Out) property naturally models the "return the most recent book" (undo) use case.
+4. **Menu-driven UI** — A console-based menu with input validation allows users to interact with the system through numbered options, keeping the UI layer thin and focused on presentation.
+
+The development approach followed these steps:
+- Defined the `LibraryADT` interface to establish the API.
+- Implemented the `Book` class as a dual-purpose data model and BST node.
+- Built the `BookBST` and `BorrowStack` data structures independently.
+- Created `SmartLibraryImpl` as the business logic facade that connects both data structures.
+- Built `SmartLibrary` as the console UI entry point.
+
+### Data Structures Used (Report)
+
+> For detailed operation tables and complexity analysis, see the [Data Structures Used](#data-structures-used) section below.
+
+**1. Binary Search Tree (BST)** — Used for the book catalogue (`BookBST.java`).
+- Each node is a `Book` object containing ISBN (key), title, author, and left/right child pointers.
+- Supports insert, search (by ISBN and by title), delete (with all three BST deletion cases), in-order traversal for sorted display, and recursive counting.
+- **Why BST?** The catalogue requires frequent lookups by ISBN. A BST provides O(log n) average-case search, insert, and delete, making it far more efficient than a linear list for these operations.
+
+**2. Stack (Linked List)** — Used for borrowing history (`BorrowStack.java`).
+- Implemented as a singly linked list of `StackNode` objects with a `top` pointer and a `size` counter.
+- Supports push, pop, isEmpty, size, and displayAll operations.
+- **Why Stack?** Borrowing history naturally follows a LIFO pattern — the most recently borrowed book is the one that should be returned first (undo). A stack models this perfectly with O(1) push and pop.
+
+### Testing
+
+The system was tested through **manual functional testing** via the console menu. The following test scenarios were executed:
+
+| Test Case | Steps | Expected Result | Status |
+|-----------|-------|-----------------|--------|
+| Add a single book | Select option 1, enter ISBN `101`, title `Data Structures`, author `John Smith` | Book added successfully, confirmation displayed | ✅ Pass |
+| Add duplicate ISBN | Add book with ISBN `101`, then attempt to add another book with ISBN `101` | Rejection message: ISBN already exists | ✅ Pass |
+| Search by ISBN (found) | Add book with ISBN `101`, then search for ISBN `101` | Book details displayed | ✅ Pass |
+| Search by ISBN (not found) | Search for ISBN `999` when it does not exist | "Book not found" message | ✅ Pass |
+| Search by title (case-insensitive) | Add book titled `Data Structures`, search for `data structures` | Book found and displayed | ✅ Pass |
+| Borrow a book | Add book with ISBN `101`, borrow ISBN `101` | Book removed from catalogue, added to history | ✅ Pass |
+| Borrow non-existent book | Attempt to borrow ISBN `999` | "Book not found" message | ✅ Pass |
+| Return last borrowed book | Borrow a book, then select return option | Book returned to catalogue, removed from history | ✅ Pass |
+| Return with empty history | Select return with no borrowed books | "No books to return" message | ✅ Pass |
+| Display empty catalogue | View catalogue when no books added | "Catalogue is empty" message | ✅ Pass |
+| Display catalogue sorted | Add books with ISBNs `300`, `100`, `200` | Books displayed in order: `100`, `200`, `300` | ✅ Pass |
+| View borrowing history | Borrow multiple books, view history | Books displayed in reverse chronological order (LIFO) | ✅ Pass |
+| Invalid menu input | Enter non-numeric or out-of-range input | Error message, menu re-displayed | ✅ Pass |
+| Invalid ISBN input | Enter negative number or non-numeric ISBN | Validation error, prompt re-displayed | ✅ Pass |
+| Empty title/author | Enter empty string for title or author | Validation error, prompt re-displayed | ✅ Pass |
+
+**Edge cases tested:**
+- Borrowing all books and verifying the catalogue is empty.
+- Returning all borrowed books and verifying the history is empty.
+- Adding books in descending ISBN order (worst-case BST scenario) and verifying all operations still work correctly.
+- BST deletion of nodes with zero, one, and two children.
+
+### Conclusion
+
+The Smart Library Management System successfully demonstrates the practical application of two fundamental data structures — a Binary Search Tree and a Stack — to solve a real-world problem.
+
+**Key achievements:**
+- **Efficient catalogue operations** — The BST provides O(log n) average-case performance for book insertion, search, and deletion, making the system scalable for larger collections.
+- **Natural undo capability** — The stack's LIFO property provides an elegant solution for returning the most recently borrowed book without additional complexity.
+- **Clean architecture** — The interface-driven, layered design ensures separation of concerns, making the codebase maintainable and extensible.
+- **Robust input handling** — Comprehensive validation prevents invalid data from entering the system.
+
+**Limitations and future improvements:**
+- The BST is not self-balancing, so inserting books in sorted ISBN order degrades performance to O(n). A future improvement could use an AVL tree or Red-Black tree.
+- Borrowing history does not persist between sessions. File-based or database storage could be added.
+- The title search is O(n) since the BST is indexed by ISBN. A secondary index (e.g., a HashMap) could enable O(1) title lookups.
+- The system is single-user. Multi-user support with authentication could be added for a more realistic library scenario.
+
+Overall, this project provided hands-on experience with BST and Stack implementations, reinforcing the importance of choosing the right data structure for each problem domain.
 
 ---
 
